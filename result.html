@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+       predict-button-container {
+            text-align: center;
+            padding: 20px 0;
+            margin-top: -15px;
+        }
+        .predict-button {
+            background-color: #f39c12;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .predict-button:hover {
+            background-color: #e67e22;
+            transform: translateY(-2px);
+        }
+
+        /* Styles copied from previous CSS for form integration */
+        .form-card {
+            max-width: 600px;
+            margin: 40px auto; /* Centered on the page */
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #1c2c36;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dcdfe3;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        .form-group button {
+            background-color: #2ecc71;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        .form-group button:hover {
+            background-color: #27ae60;
+        }
+
+        /* Global Dashboard styles (assuming these are in style.css, but repeated for context) */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: #1c2c36;
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .header h1 {
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        .header p {
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 25px;
+        }
+        
+        .model-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-left: 6px solid #4a90e2;
+            transition: all 0.3s ease;
+        }
+        /* ... (rest of your existing styles like .metrics-grid, .badge, .report-table, etc.) ... */
+        .report-content {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fafafa;
+            border: 1px solid #e0e6ec;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        .report-content pre {
+            white-space: pre-wrap;
+            font-size: 0.85em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Prediction Results ✅</h1>
+        <p>Results from the Linear and Logistic Regression Models</p>
+    </div>
+
+    <div class="container result-card model-card">
+        
+        {% if results.lr_result %}
+            
+            <div class="result-metric">
+                <h3>Predicted Sales Target (Linear Regression)</h3>
+                <span class="result-value">${{ results.lr_result }}</span>
+                <p>Based on **{{ results.input_data.review_count }}** reviews, **{{ results.input_data.avg_rating }}** rating, and **{{ results.input_data.promo_activity }}** promo activity.</p>
+            </div>
+            
+            <hr>
+
+            <div class="result-metric">
+                <h3>Predicted Interaction Conversion (Logistic Regression)</h3>
+                <span class="result-value" style="color: {% if results.logr_result == 'Yes (1)' %}#2ecc71{% else %}#e74c3c{% endif %};">
+                    {{ results.logr_result }}
+                </span>
+                <p>Based on **{{ results.input_data.distance_km }}** km distance and **{{ results.input_data.time_spent_sec }}** seconds spent on a **{{ results.input_data.interaction_type }}** interaction.</p>
+            </div>
+            
+        {% else %}
+            <p style="color: red;">Error: {{ result }}</p>
+        {% endif %}
+        
+        <a href="{{ url_for('predict_form') }}" class="back-link">← Try Another Prediction</a> |
+        <a href="{{ url_for('index') }}" class="back-link">← Go to Dashboard</a>
+
+    </div>
+</body>
+</html>

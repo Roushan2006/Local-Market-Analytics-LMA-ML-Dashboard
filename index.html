@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Market Analytics (LMA) Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .predict-button-container {
+            text-align: center;
+            padding: 20px 0;
+            margin-top: -15px; /* Pull it closer to the header */
+        }
+        .predict-button {
+            background-color: #f39c12; /* Orange color for prediction CTA */
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .predict-button:hover {
+            background-color: #e67e22;
+            transform: translateY(-2px);
+        }
+        
+        /* Keeping original styles in the <style> block for simplicity if not using external CSS */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: #1c2c36;
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .header h1 {
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        .header p {
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        /* Container and Layout */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 25px;
+        }
+        
+        /* Model Card Styling */
+        .model-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-left: 6px solid #4a90e2;
+            transition: all 0.3s ease;
+        }
+        .model-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        h2 {
+            color: #4a90e2;
+            font-weight: 600;
+            border-bottom: 1px solid #e0e6ec;
+            padding-bottom: 15px;
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .model-card p strong {
+            color: #1c2c36;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        .metric-box {
+            background-color: #eef4f9;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #dcdfe3;
+        }
+        .metric-box span {
+            font-size: 0.9em;
+            color: #666;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .metric-box strong {
+            font-size: 1.8em;
+            color: #1c2c36;
+            font-weight: 700;
+        }
+
+        /* Coefficients List */
+        .model-card ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+        .model-card ul li {
+            background-color: #f7f7f7;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 0.95em;
+            border-left: 3px solid #2ecc71;
+        }
+
+        /* Classification Badges */
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .badge-reg { background-color: #2ecc71; color: white; }
+        .badge-class { background-color: #f39c12; color: white; }
+
+        /* Classification Report Table */
+        .report-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+        .report-table th, .report-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .report-table th {
+            background-color: #4a90e2;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .report-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .report-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .toggle-report {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 20px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+            font-weight: 600;
+        }
+        .toggle-report:hover {
+            background-color: #357bd8;
+        }
+        .report-content {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fafafa;
+            border: 1px solid #e0e6ec;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        .report-content pre {
+            white-space: pre-wrap;
+            font-size: 0.85em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Local Market Analytics (LMA) Dashboard 📊</h1>
+        <p>Comparative Results for Business and User Prediction Models</p>
+    </div>
+
+    <div class="predict-button-container">
+        <a href="{{ url_for('predict_form') }}" class="predict-button">
+            ✨ Predict New Data
+        </a>
+    </div>
+    <div class="container">
+
+        <div class="model-card">
+            <h2>Linear Regression <span class="badge badge-reg">Regression</span></h2>
+            <p><strong>Goal:</strong> Predict Business Sales Target based on Reviews, Rating, and Promo Activity.</p>
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <span>Mean Squared Error (MSE)</span>
+                    <strong>{{ results.lr.MSE }}</strong>
+                </div>
+                <div class="metric-box">
+                    <span>Root MSE (RMSE)</span>
+                    <strong>{{ results.lr.RMSE }}</strong>
+                </div>
+                <div class="metric-box">
+                    <span>R-squared (R2)</span>
+                    <strong>{{ results.lr['R2 Score'] }}</strong>
+                </div>
+            </div>
+            <h3>Coefficients</h3>
+            <ul>
+                {% for key, value in results.lr.Coefficients.items() %}
+                    <li><strong>{{ key }}:</strong> <span style="color: #c0392b;">{{ value }}</span></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <hr>
+
+        <div class="model-card">
+            <h2>Decision Tree Classifier <span class="badge badge-class">Classification</span></h2>
+            <p><strong>Goal:</strong> Predict User Segment based on Age, Spend, Income, and Visit Frequency.</p>
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <span>Overall Accuracy</span>
+                    <strong>{{ results.dt.Accuracy }}</strong>
+                </div>
+            </div>
+            <h3>Classification Report (Per Segment)</h3>
+            <table class="report-table">
+                <thead>
+                    <tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1-Score</th><th>Support</th></tr>
+                </thead>
+                <tbody>
+                    {% for class_name, metrics in results.dt.Report.items() %}
+                        {% if class_name not in ['accuracy', 'macro avg', 'weighted avg'] %}
+                            <tr>
+                                <td><strong>{{ class_name }}</strong></td>
+                                <td>{{ "%.2f"|format(metrics.precision) }}</td>
+                                <td>{{ "%.2f"|format(metrics.recall) }}</td>
+                                <td>{{ "%.2f"|format(metrics['f1-score']) }}</td>
+                                <td>{{ "%.0f"|format(metrics.support) }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <hr>
+
+        <div class="model-card">
+            <h2>Logistic Regression <span class="badge badge-class">Classification</span></h2>
+            <p><strong>Goal:</strong> Predict Interaction Conversion (Yes/No) based on Distance and Time Spent.</p>
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <span>Overall Accuracy</span>
+                    <strong>{{ results.logr.Accuracy }}</strong>
+                </div>
+            </div>
+            
+            <button class="toggle-report" data-target="logr-report">Toggle Detailed Report</button>
+            <div id="logr-report" class="report-content" style="display: none;">
+                <p>Detailed Classification Report (for Conversion Target):</p>
+                <pre>{{ results.logr.Report | tojson(indent=4) }}</pre>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="model-card">
+            <h2>K-Nearest Neighbors (k-NN) <span class="badge badge-class">Classification</span></h2>
+            <p><strong>Goal:</strong> Predict User Segment (Merged Data) based on a combination of User, Interaction, and Business Features.</p>
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <span>Overall Accuracy</span>
+                    <strong>{{ results.knn.Accuracy }}</strong>
+                </div>
+            </div>
+
+            <button class="toggle-report" data-target="knn-report">Toggle Detailed Report</button>
+            <div id="knn-report" class="report-content" style="display: none;">
+                <p>Detailed Classification Report (for User Segment):</p>
+                <pre>{{ results.knn.Report | tojson(indent=4) }}</pre>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const buttons = document.querySelectorAll('.toggle-report');
+
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.getAttribute('data-target');
+                    const targetElement = document.getElementById(targetId);
+
+                    // Toggle the display property
+                    if (targetElement.style.display === 'none' || targetElement.style.display === '') {
+                        targetElement.style.display = 'block';
+                        button.textContent = 'Hide Detailed Report';
+                    } else {
+                        targetElement.style.display = 'none';
+                        button.textContent = 'Toggle Detailed Report';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
