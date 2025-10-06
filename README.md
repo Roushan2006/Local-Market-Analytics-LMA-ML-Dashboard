@@ -26,3 +26,19 @@ Follow these steps to get the dashboard running on your local machine.
 ```bash
 git clone <Your-GitHub-Repository-Link>
 cd Local-Market-Analytics-LMA
+
+
+Step 2: Create a Virtual Environment (Recommended)
+Bash
+
+python -m venv venv
+# On Windows
+venv\Scripts\activate
+# On macOS/Linux
+source venv/bin/activate
+Step 3: Install Dependencies
+All required Python libraries are listed in requirements.txt.
+
+Bash
+
+pip install -r requirements.txt
